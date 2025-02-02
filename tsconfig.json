@@ -1,5 +1,8 @@
 {
   "files": [],
+  "references": [{
+    "path": "./tsconfig.node.json"
+  }],
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
@@ -14,6 +17,9 @@
     "paths": {
       "@/*": [
         "./*"
+      ],
+      "@public/*": [
+        "./public/*"
       ],
       "@components/*": [
         "components/*"

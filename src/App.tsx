@@ -4,7 +4,6 @@ import NotFound from '@/pages/NotFound';
 import Providers from '@/providers/Providers';
 import Layout from '@/pages/Layout';
 import Dashboard from '@/pages/Dashboard';
-import ThemeProvider from './providers/ThemeProvider';
 
 function App() {
   return (

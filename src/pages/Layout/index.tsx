@@ -1,3 +1,4 @@
+import { IconifyIcon } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { ThemeContext, ThemeContextProps } from "@/providers/ThemeProvider";
 import { MenuIcon, Moon, Sun } from "lucide-react";
@@ -40,13 +41,14 @@ const Sidebar: React.FC<{ isOpen: boolean, setOpen: React.Dispatch<React.SetStat
 
       <aside id="sidebar-multi-level-sidebar"
         style={{ height: "calc(100vh - 80px)" }}
-        className={`sm:static ${isOpen ? 'absolute translate-x-1 ' : 'fixed'} sm:translate-x-1  
-      z-40 w-64 border-primary duration-300 ease-in-out rounded-xl transition-transform border-[2px]
+        className={`sm:static ${isOpen ? 'absolute translate-x-1 ' : 'fixed'} sm:translate-x-1 shadow-black  
+      z-40 border-primary duration-300 ease-in-out rounded-xl transition-transform border-[1.5px]
       ${isOpen ? "translate-x-0" : "-translate-x-full"} sm:translate-x-0`} aria-label="Sidebar">
-        <div className="h-full rounded-xl px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
+        <div className="h-full rounded-xl px-4 p-2 overflow-y-auto bg-gray-50 dark:bg-gray-800">
           <ul className="space-y-2 font-medium">
             <li>
-              <span className="items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+              <span className="content-center justify-center text-lg flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                <IconifyIcon icon={"humbleicons:dashboard"}/>
                 <span className="ms-3">Dashboard</span>
               </span>
             </li>

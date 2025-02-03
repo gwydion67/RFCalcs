@@ -14,7 +14,7 @@ const Navbar: React.FC<{ isOpen: boolean, setOpen: React.Dispatch<React.SetState
       <div className="flex flex-row items-center ">
         <MenuIcon className="hidden max-sm:block" onClick={() => setOpen(!isOpen)} />
         <span className="flex items-center flex-row font-semibold max-sm:mx-auto font-[Barriecito] text-3xl tracking-tight">
-          <img className="w-15 h-15 mr-2" src="../../../public/Logo.png" />
+          <img className="w-15 h-15 mr-2" src="Logo.png" />
           RFCalcs
         </span>
         <Button variant={'ghost'} onClick={toggleTheme} className="border relative ml-auto" >

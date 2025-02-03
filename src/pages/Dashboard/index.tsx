@@ -2,8 +2,8 @@
 
 const Dashboard = () => {
   return (
-    <div>
-      Dashboard
+    <div className="p-4 ">
+      hi
     </div>
   )
 }

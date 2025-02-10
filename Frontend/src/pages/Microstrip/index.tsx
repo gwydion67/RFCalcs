@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState, ChangeEvent, FormEvent } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,53 +7,100 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Calculator } from "lucide-react";
 
-const MicrostripCalculator = () => {
-  const [synthesisInputs, setSynthesisInputs] = useState({
-    char_impedance: '',
-    elec_length: '',
-    dielec_const: '',
-    dielect_height: '',
-    frequency: ''
+// Define interfaces for the input states
+interface SynthesisInputs {
+  char_impedance: string;
+  elec_length: string;
+  dielec_const: string;
+  dielect_height: string;
+  frequency: string;
+}
+
+interface AnalysisInputs {
+  width: string;
+  length: string;
+  dielec_const: string;
+  dielect_height: string;
+  frequency: string;
+}
+
+// Define the shape of the calculation results
+interface CalculationResult {
+  [key: string]: number;
+}
+
+// Props for the ResultCard component
+interface ResultCardProps {
+  title: string;
+  result: CalculationResult;
+}
+
+const ResultCard: React.FC<ResultCardProps> = ({ title, result }) => (
+  <Card className="mt-6">
+    <CardHeader>
+      <CardTitle className="text-lg">{title}</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <div className="grid gap-2">
+        {Object.entries(result).map(([key, value]) => (
+          <div key={key} className="flex justify-between items-center">
+            <Label className="capitalize">{key.replace(/_/g, " ")}</Label>
+            <span className="font-mono">{Number(value).toFixed(6)}</span>
+          </div>
+        ))}
+      </div>
+    </CardContent>
+  </Card>
+);
+
+const MicrostripCalculator: React.FC = () => {
+  const [synthesisInputs, setSynthesisInputs] = useState<SynthesisInputs>({
+    char_impedance: "",
+    elec_length: "",
+    dielec_const: "",
+    dielect_height: "",
+    frequency: ""
   });
 
-  const [analysisInputs, setAnalysisInputs] = useState({
-    width: '',
-    length: '',
-    dielec_const: '',
-    dielect_height: '',
-    frequency: ''
+  const [analysisInputs, setAnalysisInputs] = useState<AnalysisInputs>({
+    width: "",
+    length: "",
+    dielec_const: "",
+    dielect_height: "",
+    frequency: ""
   });
 
-  const [synthesisResult, setSynthesisResult] = useState(null);
-  const [analysisResult, setAnalysisResult] = useState(null);
-  const [error, setError] = useState('');
+  const [synthesisResult, setSynthesisResult] = useState<CalculationResult | null>(null);
+  const [analysisResult, setAnalysisResult] = useState<CalculationResult | null>(null);
+
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSynthesisChange = (e) => {
+  const handleSynthesisChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setSynthesisInputs(prev => ({
+    setSynthesisInputs((prev) => ({
       ...prev,
       [name]: value
     }));
-    setError('');
+    setError("");
     setSynthesisResult(null);
   };
 
-  const handleAnalysisChange = (e) => {
+  const handleAnalysisChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setAnalysisInputs(prev => ({
+    setAnalysisInputs((prev) => ({
       ...prev,
       [name]: value
     }));
-    setError('');
+    setError("");
     setAnalysisResult(null);
   };
 
-  const handleSynthesisSubmit = async (e) => {
+  const handleSynthesisSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
-    
+    setError("");
+
     try {
       const data = {
         char_impedance: parseFloat(synthesisInputs.char_impedance),
@@ -63,31 +110,31 @@ const MicrostripCalculator = () => {
         frequency: parseFloat(synthesisInputs.frequency)
       };
 
-      const response = await fetch('/rfcalc/synthesis-microstrip', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/rfcalc/synthesis-microstrip", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Calculation failed');
+        throw new Error(errorData.message || "Calculation failed");
       }
 
-      const result = await response.json();
+      const result: CalculationResult = await response.json();
       setSynthesisResult(result);
-    } catch (err) {
+    } catch (err: any) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAnalysisSubmit = async (e) => {
+  const handleAnalysisSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
-    
+    setError("");
+
     try {
       const data = {
         width: parseFloat(analysisInputs.width),
@@ -97,43 +144,25 @@ const MicrostripCalculator = () => {
         frequency: parseFloat(analysisInputs.frequency)
       };
 
-      const response = await fetch('/rfcalc/analysis-microstrip', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/rfcalc/analysis-microstrip", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Calculation failed');
+        throw new Error(errorData.message || "Calculation failed");
       }
 
-      const result = await response.json();
+      const result: CalculationResult = await response.json();
       setAnalysisResult(result);
-    } catch (err) {
+    } catch (err: any) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
   };
-
-  const ResultCard = ({ title, result }) => (
-    <Card className="mt-6">
-      <CardHeader>
-        <CardTitle className="text-lg">{title}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid gap-2">
-          {Object.entries(result).map(([key, value]) => (
-            <div key={key} className="flex justify-between items-center">
-              <Label className="capitalize">{key.replace(/_/g, ' ')}:</Label>
-              <span className="font-mono">{Number(value).toFixed(6)}</span>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
-  );
 
   return (
     <div className="container mx-auto p-4 max-w-2xl">
@@ -232,7 +261,7 @@ const MicrostripCalculator = () => {
                   />
                 </div>
                 <Button type="submit" disabled={loading}>
-                  {loading ? 'Calculating...' : 'Calculate'}
+                  {loading ? "Calculating..." : "Calculate"}
                 </Button>
               </form>
             </CardContent>
@@ -313,7 +342,7 @@ const MicrostripCalculator = () => {
                   />
                 </div>
                 <Button type="submit" disabled={loading}>
-                  {loading ? 'Calculating...' : 'Calculate'}
+                  {loading ? "Calculating..." : "Calculate"}
                 </Button>
               </form>
             </CardContent>

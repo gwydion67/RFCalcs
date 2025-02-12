@@ -12,6 +12,10 @@ function validateNumber(value: number, name: string): number {
   return value;
 }
 
+interface ErrorMessage {
+  message: any
+}
+
 interface SubstrateData {
   dielec_const: number;
   dielect_height: number;
@@ -19,6 +23,7 @@ interface SubstrateData {
 }
 
 interface MicrostripSynthesisData extends SubstrateData {
+  metal_thickness: number;
   char_impedance: number;
   elec_length: number;
 }
@@ -40,6 +45,15 @@ interface MicrostripAnalysisResult {
   eff_dielec_const: number;
 }
 
+interface MicrostripSynthesisResponse {
+  result?: MicrostripSynthesisResult
+  error?: ErrorMessage
+}
+
+interface MicrostripAnalysisResponse {
+  result?: MicrostripAnalysisResult
+  error?: ErrorMessage
+}
 const get_H_dash = (char_impedance: number, dielec_const: number): number => {
   let z0 = validateNumber(char_impedance, 'characteristic impedance');
   let er = validateNumber(dielec_const, 'dielectric constant');
@@ -67,7 +81,7 @@ const get_eff_e = (dielec_const: number, height: number, width: number): number 
   return validateNumber(e_re, 'effective dielectric constant');
 };
 
-const get_width = (dielect_height: number, char_impedance: number, dielec_const: number): number => {
+const get_width = (dielect_height: number, metal_thickness: number, char_impedance: number, dielec_const: number): number => {
   let width: number;
 
   if (char_impedance > (44 - 2 * dielec_const)) {
@@ -80,6 +94,7 @@ const get_width = (dielect_height: number, char_impedance: number, dielec_const:
     let t2 = ((dielec_const - 1) / (Math.PI * dielec_const)) * (Math.log(d_er - 1) + 0.293 - (0.517 / dielec_const));
     width = dielect_height * (t1 + t2);
   }
+  width = width - 1.25 * metal_thickness;
 
   return validateNumber(width, 'width');
 };
@@ -104,44 +119,64 @@ const get_char_impedance = (eff_e: number, dielect_height: number, width: number
   return z0;
 };
 
-const synthesis = async (SynthesisData: MicrostripSynthesisData): Promise<MicrostripSynthesisResult> => {
-  // Validate input parameters
-  validateNumber(SynthesisData.char_impedance, 'input characteristic impedance');
-  validateNumber(SynthesisData.dielec_const, 'input dielectric constant');
-  validateNumber(SynthesisData.frequency, 'input frequency');
-  validateNumber(SynthesisData.dielect_height, 'input dielectric height');
-  validateNumber(SynthesisData.elec_length, 'input electrical length');
+const synthesis = async (SynthesisData: MicrostripSynthesisData): Promise<MicrostripSynthesisResponse> => {
+  try {
+    // Validate input parameters
+    validateNumber(SynthesisData.char_impedance, 'input characteristic impedance');
+    validateNumber(SynthesisData.dielec_const, 'input dielectric constant');
+    validateNumber(SynthesisData.frequency, 'input frequency');
+    validateNumber(SynthesisData.dielect_height, 'input dielectric height');
+    validateNumber(SynthesisData.elec_length, 'input electrical length');
+    validateNumber(SynthesisData.metal_thickness, 'input metal thickness');
 
-  let width = get_width(SynthesisData.dielect_height, SynthesisData.char_impedance, SynthesisData.dielec_const);
-  let length = get_phy_length(SynthesisData.elec_length, SynthesisData.dielec_const, SynthesisData.frequency);
-  let eff_dielec_const = get_eff_e(SynthesisData.dielec_const, SynthesisData.dielect_height, width);
+    const width = get_width(SynthesisData.dielect_height, SynthesisData.char_impedance, SynthesisData.dielec_const, SynthesisData.metal_thickness);
+    const length = get_phy_length(SynthesisData.elec_length, SynthesisData.dielec_const, SynthesisData.frequency);
+    const eff_dielec_const = get_eff_e(SynthesisData.dielec_const, SynthesisData.dielect_height, width);
 
-  return {
-    width: validateNumber(width, 'result width'),
-    length: validateNumber(length, 'result length'),
-    eff_dielec_const: validateNumber(eff_dielec_const, 'result effective dielectric constant')
-  };
+    return {
+      result: {
+        width: validateNumber(width, 'result width'),
+        length: validateNumber(length, 'result length'),
+        eff_dielec_const: validateNumber(eff_dielec_const, 'result effective dielectric constant')
+      }
+    };
+  } catch (err) {
+    return {
+      error: {
+        message: err instanceof Error ? err.message : 'An unknown error occurred'
+      }
+    };
+  }
 };
 
-const analysis = async (AnalysisData: MicrostripAnalysisData): Promise<MicrostripAnalysisResult> => {
-  // Validate input parameters
-  validateNumber(AnalysisData.dielect_height, 'input dielectric height');
-  validateNumber(AnalysisData.dielec_const, 'input dielectric constant');
-  validateNumber(AnalysisData.frequency, 'input frequency');
-  validateNumber(AnalysisData.length, 'input length');
-  validateNumber(AnalysisData.width, 'input width');
+const analysis = async (AnalysisData: MicrostripAnalysisData): Promise<MicrostripAnalysisResponse> => {
+  try {
+    // Validate input parameters
+    validateNumber(AnalysisData.dielect_height, 'input dielectric height');
+    validateNumber(AnalysisData.dielec_const, 'input dielectric constant');
+    validateNumber(AnalysisData.frequency, 'input frequency');
+    validateNumber(AnalysisData.length, 'input length');
+    validateNumber(AnalysisData.width, 'input width');
 
-  let eff_dielec_const = get_eff_e(AnalysisData.dielec_const, AnalysisData.dielect_height, AnalysisData.width);
-  let char_impedance = get_char_impedance(eff_dielec_const, AnalysisData.dielect_height, AnalysisData.width);
-  let elec_length = get_elec_length(AnalysisData.length, eff_dielec_const, AnalysisData.frequency);
+    const eff_dielec_const = get_eff_e(AnalysisData.dielec_const, AnalysisData.dielect_height, AnalysisData.width);
+    const char_impedance = get_char_impedance(eff_dielec_const, AnalysisData.dielect_height, AnalysisData.width);
+    const elec_length = get_elec_length(AnalysisData.length, eff_dielec_const, AnalysisData.frequency);
 
-  return {
-    char_impedance: validateNumber(char_impedance, 'result characteristic impedance'),
-    elec_length: validateNumber(elec_length, 'result electrical length'),
-    eff_dielec_const: validateNumber(eff_dielec_const, 'result effective dielectric constant')
-  };
+    return {
+      result: {
+        char_impedance: validateNumber(char_impedance, 'result characteristic impedance'),
+        elec_length: validateNumber(elec_length, 'result electrical length'),
+        eff_dielec_const: validateNumber(eff_dielec_const, 'result effective dielectric constant')
+      }
+    };
+  } catch (err) {
+    return {
+      error: {
+        message: err instanceof Error ? err.message : 'An unknown error occurred'
+      }
+    };
+  }
 };
-
 export const synthesisMicrostrip = api(
   { method: "POST", path: "/rfcalc/synthesis-microstrip", expose: true },
   (params: MicrostripSynthesisData) => synthesis(params)

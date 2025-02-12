@@ -28,6 +28,31 @@ const lengthUnits: Record<string, number> = {
   mil: 2.54e-5,
 };
 
+interface MicrostripSynthesisResult {
+  width: number;
+  length: number;
+  eff_dielec_const: number;
+}
+
+interface MicrostripAnalysisResult {
+  char_impedance: number;
+  elec_length: number;
+  eff_dielec_const: number;
+}
+
+interface ErrorMessage {
+  message: any
+}
+
+interface MicrostripSynthesisResponse {
+  result?: MicrostripSynthesisResult
+  error?: ErrorMessage
+}
+
+interface MicrostripAnalysisResponse {
+  result?: MicrostripAnalysisResult
+  error?: ErrorMessage
+}
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 function convertToSI(value: number, unit: string, conversionDict: Record<string, number>): number {
@@ -50,10 +75,10 @@ export default function MicrostripCalculatorPage() {
   const [synthElecLength, setSynthElecLength] = useState("");
 
   // Synthesis Results
-  const [synthWidth, setSynthWidth] = useState<number | null>(null);
-  const [synthLength, setSynthLength] = useState<number | null>(null);
-  const [synthEffDielec, setSynthEffDielec] = useState<number | null>(null);
-  const [synthError, setSynthError] = useState<string | null>(null);
+  const [synthWidth, setSynthWidth] = useState<number | undefined>(undefined);
+  const [synthLength, setSynthLength] = useState<number | undefined>(undefined);
+  const [synthEffDielec, setSynthEffDielec] = useState<number | undefined>(undefined);
+  const [synthError, setSynthError] = useState<string | undefined>(undefined);
 
   // ------------------------- Analysis Form State -------------------------
   const [analysisFrequency, setAnalysisFrequency] = useState("");
@@ -64,10 +89,10 @@ export default function MicrostripCalculatorPage() {
   const [analysisWidthUnit, setAnalysisWidthUnit] = useState("mm");
 
   // Analysis Results
-  const [analysisCharImpedance, setAnalysisCharImpedance] = useState<number | null>(null);
-  const [analysisElecLength, setAnalysisElecLength] = useState<number | null>(null);
-  const [analysisEffDielec, setAnalysisEffDielec] = useState<number | null>(null);
-  const [analysisError, setAnalysisError] = useState<string | null>(null);
+  const [analysisCharImpedance, setAnalysisCharImpedance] = useState<number | undefined>(undefined);
+  const [analysisElecLength, setAnalysisElecLength] = useState<number | undefined>(undefined);
+  const [analysisEffDielec, setAnalysisEffDielec] = useState<number | undefined>(undefined);
+  const [analysisError, setAnalysisError] = useState<string | undefined>(undefined);
 
   // ------------------------- Tabs State -------------------------
   const [activeTab, setActiveTab] = useState("synthesis");
@@ -77,7 +102,7 @@ export default function MicrostripCalculatorPage() {
   // ----------------------------------------------------------------------------
   async function handleSynthesis() {
     try {
-      setSynthError(null);
+      setSynthError(undefined);
 
       // Convert substrate parameters
       const dielec_const = parseFloat(subDielecConst);
@@ -103,17 +128,16 @@ export default function MicrostripCalculatorPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-      console.log( response )
 
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(errorText);
       }
-      const result = await response.json();
-      console.log(response)
-      setSynthWidth(result.width);
-      setSynthLength(result.length);
-      setSynthEffDielec(result.eff_dielec_const);
+      const result: MicrostripSynthesisResponse = await response.json();
+      console.log(result)
+      setSynthWidth(result?.result?.width);
+      setSynthLength(result?.result?.length);
+      setSynthEffDielec(result?.result?.eff_dielec_const);
     } catch (err: any) {
       setSynthError(err.message || "An error occurred during synthesis calculation.");
     }
@@ -124,7 +148,7 @@ export default function MicrostripCalculatorPage() {
   // ----------------------------------------------------------------------------
   async function handleAnalysis() {
     try {
-      setAnalysisError(null);
+      setAnalysisError(undefined);
 
       // Convert substrate parameters
       const dielec_const = parseFloat(subDielecConst);
@@ -348,9 +372,9 @@ export default function MicrostripCalculatorPage() {
                     {synthWidth !== null && synthLength !== null && synthEffDielec !== null && (
                       <div className="mt-4 p-4 rounded-md border">
                         <h3 className="font-semibold mb-2">Synthesis Results</h3>
-                        <p>Width: {synthWidth.toExponential(5)} m</p>
-                        <p>Length: {synthLength.toExponential(5)} m</p>
-                        <p>Effective Dielectric Constant: {synthEffDielec.toFixed(5)}</p>
+                        <p>Width: {synthWidth?.toExponential(5)} m</p>
+                        <p>Length: {synthLength?.toExponential(5)} m</p>
+                        <p>Effective Dielectric Constant: {synthEffDielec?.toFixed(5)}</p>
                       </div>
                     )}
                   </motion.div>
@@ -483,9 +507,9 @@ export default function MicrostripCalculatorPage() {
                       analysisEffDielec !== null && (
                         <div className="mt-4 p-4 rounded-md border">
                           <h3 className="font-semibold mb-2">Analysis Results</h3>
-                          <p>Characteristic Impedance: {analysisCharImpedance.toFixed(5)} Ω</p>
-                          <p>Electrical Length: {analysisElecLength.toFixed(5)} °</p>
-                          <p>Effective Dielectric Constant: {analysisEffDielec.toFixed(5)}</p>
+                          <p>Characteristic Impedance: {analysisCharImpedance?.toFixed(5)} Ω</p>
+                          <p>Electrical Length: {analysisElecLength?.toFixed(5)} °</p>
+                          <p>Effective Dielectric Constant: {analysisEffDielec?.toFixed(5)}</p>
                         </div>
                       )}
                   </motion.div>

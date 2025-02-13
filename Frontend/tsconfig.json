@@ -8,11 +8,13 @@
     "module": "ESNext",
     "jsx": "react-jsx",
     "strict": true,
+    "noEmit": true,
     "resolveJsonModule": true,
     "moduleResolution": "node",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
+    "allowImportingTsExtensions": true,
     "baseUrl": "./src",
     "paths": {
       "@/*": [

@@ -19,7 +19,9 @@ const Layout: React.FC = () => {
           isOpen={isSidebarOpen}
           setOpen={setSidebarOpen}
         />
+        <div className="ml-44">
         <Outlet />
+        </div>
       </main>
     </div>
   )

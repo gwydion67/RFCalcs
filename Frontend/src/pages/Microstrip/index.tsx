@@ -191,7 +191,7 @@ export default function MicrostripCalculatorPage() {
   // Render
   // ----------------------------------------------------------------------------
   return (
-    <div className="container mx-auto p-4">
+    <div className="container max-w-3xl mx-auto p-4">
       <Card className="shadow-md">
         <CardHeader>
           <CardTitle className="text-center">Microstrip Calculator</CardTitle>

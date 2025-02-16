@@ -32,7 +32,7 @@ const Sidebar: React.FC<{ isOpen: boolean, setOpen: React.Dispatch<React.SetStat
 
       <aside id="sidebar-multi-level-sidebar"
         style={{ height: "calc(100vh - 80px)" }}
-        className={`sm:absolute w-44 fixed ${isOpen ? 'absolute translate-x-1 ' : 'fixed'} sm:translate-x-1 shadow-black  
+        className={`sm:fixed w-44 fixed ${isOpen ? 'absolute translate-x-1 ' : 'fixed'} sm:translate-x-1 shadow-black  
       z-40 border-primary duration-300 ease-in-out rounded-xl transition-transform border-[1.5px]
       ${isOpen ? "translate-x-0" : "-translate-x-full"} sm:translate-x-0`} aria-label="Sidebar">
         <div className="h-full rounded-xl px-4 p-2 overflow-y-auto bg-gray-50 dark:bg-gray-800">

@@ -19,8 +19,8 @@ const Layout: React.FC = () => {
           isOpen={isSidebarOpen}
           setOpen={setSidebarOpen}
         />
-        <div className="ml-44">
-        <Outlet />
+        <div className="sm:ml-44 flex flex-1 justify-items-center justify-center ">
+          <Outlet />
         </div>
       </main>
     </div>

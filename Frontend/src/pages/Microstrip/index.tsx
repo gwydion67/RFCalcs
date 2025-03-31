@@ -3,7 +3,13 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -41,21 +47,25 @@ interface MicrostripAnalysisResult {
 }
 
 interface ErrorMessage {
-  message: any
+  message: any;
 }
 
 interface MicrostripSynthesisResponse {
-  result?: MicrostripSynthesisResult
-  error?: ErrorMessage
+  result?: MicrostripSynthesisResult;
+  error?: ErrorMessage;
 }
 
 interface MicrostripAnalysisResponse {
-  result?: MicrostripAnalysisResult
-  error?: ErrorMessage
+  result?: MicrostripAnalysisResult;
+  error?: ErrorMessage;
 }
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-function convertToSI(value: number, unit: string, conversionDict: Record<string, number>): number {
+function convertToSI(
+  value: number,
+  unit: string,
+  conversionDict: Record<string, number>,
+): number {
   const factor = conversionDict[unit];
   return value * factor;
 }
@@ -77,7 +87,9 @@ export default function MicrostripCalculatorPage() {
   // Synthesis Results
   const [synthWidth, setSynthWidth] = useState<number | undefined>(undefined);
   const [synthLength, setSynthLength] = useState<number | undefined>(undefined);
-  const [synthEffDielec, setSynthEffDielec] = useState<number | undefined>(undefined);
+  const [synthEffDielec, setSynthEffDielec] = useState<number | undefined>(
+    undefined,
+  );
   const [synthError, setSynthError] = useState<string | undefined>(undefined);
 
   // ------------------------- Analysis Form State -------------------------
@@ -89,10 +101,18 @@ export default function MicrostripCalculatorPage() {
   const [analysisWidthUnit, setAnalysisWidthUnit] = useState("mm");
 
   // Analysis Results
-  const [analysisCharImpedance, setAnalysisCharImpedance] = useState<number | undefined>(undefined);
-  const [analysisElecLength, setAnalysisElecLength] = useState<number | undefined>(undefined);
-  const [analysisEffDielec, setAnalysisEffDielec] = useState<number | undefined>(undefined);
-  const [analysisError, setAnalysisError] = useState<string | undefined>(undefined);
+  const [analysisCharImpedance, setAnalysisCharImpedance] = useState<
+    number | undefined
+  >(undefined);
+  const [analysisElecLength, setAnalysisElecLength] = useState<
+    number | undefined
+  >(undefined);
+  const [analysisEffDielec, setAnalysisEffDielec] = useState<
+    number | undefined
+  >(undefined);
+  const [analysisError, setAnalysisError] = useState<string | undefined>(
+    undefined,
+  );
 
   // ------------------------- Tabs State -------------------------
   const [activeTab, setActiveTab] = useState("synthesis");
@@ -106,11 +126,23 @@ export default function MicrostripCalculatorPage() {
 
       // Convert substrate parameters
       const dielec_const = parseFloat(subDielecConst);
-      const dielect_height = convertToSI(parseFloat(subDielectHeight), subDielectHeightUnit, lengthUnits);
-      const metal_thickness = convertToSI(parseFloat(subMetalThickness), subMetalThicknessUnit, lengthUnits);
+      const dielect_height = convertToSI(
+        parseFloat(subDielectHeight),
+        subDielectHeightUnit,
+        lengthUnits,
+      );
+      const metal_thickness = convertToSI(
+        parseFloat(subMetalThickness),
+        subMetalThicknessUnit,
+        lengthUnits,
+      );
 
       // Convert synthesis-specific parameters
-      const frequency = convertToSI(parseFloat(synthFrequency), synthFrequencyUnit, frequencyUnits);
+      const frequency = convertToSI(
+        parseFloat(synthFrequency),
+        synthFrequencyUnit,
+        frequencyUnits,
+      );
       const char_impedance = parseFloat(synthCharImpedance);
       const elec_length = parseFloat(synthElecLength);
 
@@ -134,12 +166,14 @@ export default function MicrostripCalculatorPage() {
         throw new Error(errorText);
       }
       const result: MicrostripSynthesisResponse = await response.json();
-      console.log(result)
+      console.log(result);
       setSynthWidth(result?.result?.width);
       setSynthLength(result?.result?.length);
       setSynthEffDielec(result?.result?.eff_dielec_const);
     } catch (err: any) {
-      setSynthError(err.message || "An error occurred during synthesis calculation.");
+      setSynthError(
+        err.message || "An error occurred during synthesis calculation.",
+      );
     }
   }
 
@@ -152,13 +186,33 @@ export default function MicrostripCalculatorPage() {
 
       // Convert substrate parameters
       const dielec_const = parseFloat(subDielecConst);
-      const dielect_height = convertToSI(parseFloat(subDielectHeight), subDielectHeightUnit, lengthUnits);
-      const metal_thickness = convertToSI(parseFloat(subMetalThickness), subMetalThicknessUnit, lengthUnits);
+      const dielect_height = convertToSI(
+        parseFloat(subDielectHeight),
+        subDielectHeightUnit,
+        lengthUnits,
+      );
+      const metal_thickness = convertToSI(
+        parseFloat(subMetalThickness),
+        subMetalThicknessUnit,
+        lengthUnits,
+      );
 
       // Convert analysis-specific parameters
-      const frequency = convertToSI(parseFloat(analysisFrequency), analysisFrequencyUnit, frequencyUnits);
-      const length = convertToSI(parseFloat(analysisLength), analysisLengthUnit, lengthUnits);
-      const width = convertToSI(parseFloat(analysisWidth), analysisWidthUnit, lengthUnits);
+      const frequency = convertToSI(
+        parseFloat(analysisFrequency),
+        analysisFrequencyUnit,
+        frequencyUnits,
+      );
+      const length = convertToSI(
+        parseFloat(analysisLength),
+        analysisLengthUnit,
+        lengthUnits,
+      );
+      const width = convertToSI(
+        parseFloat(analysisWidth),
+        analysisWidthUnit,
+        lengthUnits,
+      );
 
       const body = {
         dielec_const,
@@ -178,12 +232,14 @@ export default function MicrostripCalculatorPage() {
         throw new Error(errorText);
       }
 
-      const result = await response.json();
+      const result: MicrostripAnalysisResult = await response.json();
       setAnalysisCharImpedance(result.char_impedance);
       setAnalysisElecLength(result.elec_length);
       setAnalysisEffDielec(result.eff_dielec_const);
     } catch (err: any) {
-      setAnalysisError(err.message || "An error occurred during analysis calculation.");
+      setAnalysisError(
+        err.message || "An error occurred during analysis calculation.",
+      );
     }
   }
 
@@ -199,7 +255,9 @@ export default function MicrostripCalculatorPage() {
         <CardContent>
           {/* ======================== Substrate Parameters ======================== */}
           <div className="mb-6">
-            <h2 className="font-semibold mb-4 text-lg">Substrate (Dielectric) Parameters</h2>
+            <h2 className="font-semibold mb-4 text-lg">
+              Substrate (Dielectric) Parameters
+            </h2>
             <div className="grid gap-4 md:grid-cols-2">
               {/* Dielectric Constant */}
               <div>
@@ -336,20 +394,26 @@ export default function MicrostripCalculatorPage() {
 
                       {/* Characteristic Impedance */}
                       <div>
-                        <Label htmlFor="synthCharImpedance">Characteristic Impedance (Ω)</Label>
+                        <Label htmlFor="synthCharImpedance">
+                          Characteristic Impedance (Ω)
+                        </Label>
                         <Input
                           id="synthCharImpedance"
                           type="number"
                           step="any"
                           placeholder="e.g. 50"
                           value={synthCharImpedance}
-                          onChange={(e) => setSynthCharImpedance(e.target.value)}
+                          onChange={(e) =>
+                            setSynthCharImpedance(e.target.value)
+                          }
                         />
                       </div>
 
                       {/* Electrical Length */}
                       <div>
-                        <Label htmlFor="synthElecLength">Electrical Length (°)</Label>
+                        <Label htmlFor="synthElecLength">
+                          Electrical Length (°)
+                        </Label>
                         <Input
                           id="synthElecLength"
                           type="number"
@@ -362,21 +426,30 @@ export default function MicrostripCalculatorPage() {
                     </div>
 
                     <div className="mt-4 flex justify-end">
-                      <Button onClick={handleSynthesis}>Calculate Synthesis</Button>
+                      <Button onClick={handleSynthesis}>
+                        Calculate Synthesis
+                      </Button>
                     </div>
 
                     {/* Synthesis Results */}
                     {synthError && (
                       <p className="mt-2 text-red-500 text-sm">{synthError}</p>
                     )}
-                    {synthWidth !== null && synthLength !== null && synthEffDielec !== null && (
-                      <div className="mt-4 p-4 rounded-md border">
-                        <h3 className="font-semibold mb-2">Synthesis Results</h3>
-                        <p>Width: {synthWidth?.toExponential(5)} m</p>
-                        <p>Length: {synthLength?.toExponential(5)} m</p>
-                        <p>Effective Dielectric Constant: {synthEffDielec?.toFixed(5)}</p>
-                      </div>
-                    )}
+                    {synthWidth !== null &&
+                      synthLength !== null &&
+                      synthEffDielec !== null && (
+                        <div className="mt-4 p-4 rounded-md border">
+                          <h3 className="font-semibold mb-2">
+                            Synthesis Results
+                          </h3>
+                          <p>Width: {synthWidth?.toExponential(5)} m</p>
+                          <p>Length: {synthLength?.toExponential(5)} m</p>
+                          <p>
+                            Effective Dielectric Constant:{" "}
+                            {synthEffDielec?.toFixed(5)}
+                          </p>
+                        </div>
+                      )}
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -404,7 +477,9 @@ export default function MicrostripCalculatorPage() {
                             step="any"
                             placeholder="e.g. 2.45"
                             value={analysisFrequency}
-                            onChange={(e) => setAnalysisFrequency(e.target.value)}
+                            onChange={(e) =>
+                              setAnalysisFrequency(e.target.value)
+                            }
                           />
                         </div>
                         <div className="w-28">
@@ -430,7 +505,9 @@ export default function MicrostripCalculatorPage() {
                       {/* Physical Length */}
                       <div className="flex space-x-2">
                         <div className="flex-1">
-                          <Label htmlFor="analysisLength">Physical Length</Label>
+                          <Label htmlFor="analysisLength">
+                            Physical Length
+                          </Label>
                           <Input
                             id="analysisLength"
                             type="number"
@@ -495,21 +572,36 @@ export default function MicrostripCalculatorPage() {
                     </div>
 
                     <div className="mt-4 flex justify-end">
-                      <Button onClick={handleAnalysis}>Calculate Analysis</Button>
+                      <Button onClick={handleAnalysis}>
+                        Calculate Analysis
+                      </Button>
                     </div>
 
                     {/* Analysis Results */}
                     {analysisError && (
-                      <p className="mt-2 text-red-500 text-sm">{analysisError}</p>
+                      <p className="mt-2 text-red-500 text-sm">
+                        {analysisError}
+                      </p>
                     )}
                     {analysisCharImpedance !== null &&
                       analysisElecLength !== null &&
                       analysisEffDielec !== null && (
                         <div className="mt-4 p-4 rounded-md border">
-                          <h3 className="font-semibold mb-2">Analysis Results</h3>
-                          <p>Characteristic Impedance: {analysisCharImpedance?.toFixed(5)} Ω</p>
-                          <p>Electrical Length: {analysisElecLength?.toFixed(5)} °</p>
-                          <p>Effective Dielectric Constant: {analysisEffDielec?.toFixed(5)}</p>
+                          <h3 className="font-semibold mb-2">
+                            Analysis Results
+                          </h3>
+                          <p>
+                            Characteristic Impedance:{" "}
+                            {analysisCharImpedance?.toFixed(5)} Ω
+                          </p>
+                          <p>
+                            Electrical Length: {analysisElecLength?.toFixed(5)}{" "}
+                            °
+                          </p>
+                          <p>
+                            Effective Dielectric Constant:{" "}
+                            {analysisEffDielec?.toFixed(5)}
+                          </p>
                         </div>
                       )}
                   </motion.div>

@@ -232,10 +232,10 @@ export default function MicrostripCalculatorPage() {
         throw new Error(errorText);
       }
 
-      const result: MicrostripAnalysisResult = await response.json();
-      setAnalysisCharImpedance(result.char_impedance);
-      setAnalysisElecLength(result.elec_length);
-      setAnalysisEffDielec(result.eff_dielec_const);
+      const result: MicrostripAnalysisResponse = await response.json();
+      setAnalysisCharImpedance(result?.result?.char_impedance);
+      setAnalysisElecLength(result?.result?.elec_length);
+      setAnalysisEffDielec(result?.result?.eff_dielec_const);
     } catch (err: any) {
       setAnalysisError(
         err.message || "An error occurred during analysis calculation.",

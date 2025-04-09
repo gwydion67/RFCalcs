@@ -7,6 +7,7 @@ import {
   get_char_impedance,
   get_elec_length,
 } from "./methods";
+import { MicrostripAnalysisData, MicrostripAnalysisResponse, MicrostripSynthesisData, MicrostripSynthesisResponse } from "./types";
 
 export const synthesisMicrostrip = api(
   { method: "POST", path: "/rfcalc/synthesis-microstrip", expose: true },

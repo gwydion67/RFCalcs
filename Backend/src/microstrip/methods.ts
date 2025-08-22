@@ -19,11 +19,15 @@ const get_d_er = (char_impedance: number, dielec_const: number): number => {
   return validateNumber(d_er, "d_er");
 };
 
-const get_eff_e = (
-  dielec_const: number,
-  height: number,
-  width: number,
-): number => {
+const get_eff_e = ({
+  dielec_const,
+  height,
+  width,
+}: {
+  dielec_const: number;
+  height: number;
+  width: number;
+}): number => {
   let u = validateNumber(width / height, "width/height ratio");
   let er = validateNumber(dielec_const, "dielectric constant");
 
@@ -42,10 +46,17 @@ const get_eff_e = (
   return validateNumber(e_re, "effective dielectric constant");
 };
 
-const calculate_width_h = (
-  char_impedance: number,
-  dielec_const: number,
-): number => {
+const calculate_width_h = ({
+  char_impedance,
+  dielec_const,
+  metal_thickness,
+  dielect_height,
+}: {
+  char_impedance: number;
+  dielec_const: number;
+  metal_thickness: number;
+  dielect_height: number;
+}): number => {
   let width_h: number;
 
   if (char_impedance > 44 - 2 * dielec_const) {
@@ -61,6 +72,7 @@ const calculate_width_h = (
     width_h = 1 * (t1 + t2);
   }
 
+  width_h = width_h - (1.25 * metal_thickness) / dielect_height;
   return width_h;
 };
 
@@ -75,10 +87,14 @@ const get_width = ({
   char_impedance: number;
   dielec_const: number;
 }): number => {
-  let width_h = calculate_width_h(char_impedance, dielec_const);
+  let width_h = calculate_width_h({
+    char_impedance,
+    dielec_const,
+    metal_thickness,
+    dielect_height,
+  });
   let width = width_h * dielect_height;
   console.log("width ", width);
-  width = width - 1.25 * metal_thickness;
 
   return validateNumber(width, "width");
 };
@@ -94,22 +110,30 @@ const get_phy_length = (
   return validateNumber(phy_length, "physical length");
 };
 
-const get_elec_length = (
-  phy_length: number,
-  eff_dielec_const: number,
-  frequency: number,
-): number => {
+const get_elec_length = ({
+  phy_length,
+  eff_dielec_const,
+  frequency,
+}: {
+  phy_length: number;
+  eff_dielec_const: number;
+  frequency: number;
+}): number => {
   const c = 299792458; // Speed of light in vacuum in m/s
   let elec_length =
     (frequency * Math.sqrt(eff_dielec_const) * (phy_length * 360)) / c;
   return validateNumber(elec_length, "electrical length");
 };
 
-const get_char_impedance = (
-  eff_e: number,
-  dielect_height: number,
-  width: number,
-): number => {
+const get_char_impedance = ({
+  eff_e,
+  dielect_height,
+  width,
+}: {
+  eff_e: number;
+  dielect_height: number;
+  width: number;
+}): number => {
   let r = validateNumber(dielect_height / width, "height/width ratio");
   let F1 = 6 + (2 * Math.PI - 6) * Math.exp(-1 * Math.pow(30.999 * r, 0.7528));
   let z_1 = 60 * Math.log(F1 * r + Math.sqrt(1 + Math.pow(2 * r, 2)));

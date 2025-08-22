@@ -7,7 +7,12 @@ import {
   get_char_impedance,
   get_elec_length,
 } from "./methods";
-import { MicrostripAnalysisData, MicrostripAnalysisResponse, MicrostripSynthesisData, MicrostripSynthesisResponse } from "./types";
+import {
+  MicrostripAnalysisData,
+  MicrostripAnalysisResponse,
+  MicrostripSynthesisData,
+  MicrostripSynthesisResponse,
+} from "./types";
 
 export const synthesisMicrostrip = api(
   { method: "POST", path: "/rfcalc/synthesis-microstrip", expose: true },
@@ -32,11 +37,11 @@ export const synthesisMicrostrip = api(
         char_impedance: SynthesisData.char_impedance,
         dielec_const: SynthesisData.dielec_const,
       });
-      const eff_dielec_const = get_eff_e(
-        SynthesisData.dielec_const,
-        SynthesisData.dielect_height,
-        width,
-      );
+      const eff_dielec_const = get_eff_e({
+        dielec_const: SynthesisData.dielec_const,
+        height: SynthesisData.dielect_height,
+        width: width,
+      });
       const length = get_phy_length(
         SynthesisData.elec_length,
         eff_dielec_const,
@@ -77,21 +82,21 @@ export const analysisMicrostrip = api(
       validateNumber(AnalysisData.length, "input length");
       validateNumber(AnalysisData.width, "input width");
 
-      const eff_dielec_const = get_eff_e(
-        AnalysisData.dielec_const,
-        AnalysisData.dielect_height,
-        AnalysisData.width,
-      );
-      const char_impedance = get_char_impedance(
-        eff_dielec_const,
-        AnalysisData.dielect_height,
-        AnalysisData.width,
-      );
-      const elec_length = get_elec_length(
-        AnalysisData.length,
-        eff_dielec_const,
-        AnalysisData.frequency,
-      );
+      const eff_dielec_const = get_eff_e({
+        dielec_const: AnalysisData.dielec_const,
+        height: AnalysisData.dielect_height,
+        width: AnalysisData.width,
+      });
+      const char_impedance = get_char_impedance({
+        eff_e: eff_dielec_const,
+        dielect_height: AnalysisData.dielect_height,
+        width: AnalysisData.width,
+      });
+      const elec_length = get_elec_length({
+        phy_length: AnalysisData.length,
+        eff_dielec_const: eff_dielec_const,
+        frequency: AnalysisData.frequency,
+      });
 
       return {
         result: {
